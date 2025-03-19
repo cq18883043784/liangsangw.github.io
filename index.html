@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德静财税Pro - 企业级财税AI助手</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <style>
+        :root {
+            --primary: #2C5282;
+            --primary-light: #4A69A2;
+            --primary-dark: #1A365D;
+            --secondary: #F7FAFC;
+            --accent: #F6AD55;
+            --text: #2D3748;
+            --text-light: #718096;
+            --bg: #EDF2F7;
+            --white: #FFFFFF;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --ai-avatar: url('https://img.z4a.net/images/2025/03/19/djzz.jpeg');
+            --user-avatar: url('https://img.z4a.net/images/2025/03/19/yh.webp');
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', '微软雅黑', system-ui, -apple-system, sans-serif;
+            background: url('https://img.z4a.net/images/2025/03/19/bj.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--white);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            filter: brightness(0) invert(1);
+            transition: var(--transition);
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            font-size: 18px;
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--secondary);
+        }
+
+        #chatHistory {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            max-width: 85%;
+        }
+
+        .user-message {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            border: 2px solid var(--white);
+            box-shadow: 0 3px 10px var(--shadow);
+        }
+
+        .user-avatar {
+            background-image: var(--user-avatar);
+        }
+
+        .ai-avatar {
+            background-image: var(--ai-avatar);
+        }
+
+        .bubble {
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            position: relative;
+            line-height: 1.6;
+            font-size: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-bubble {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border-radius: var(--radius-md) var(--radius-sm) var(--radius-md) var(--radius-md);
+        }
+
+        .ai-bubble {
+            background: var(--white);
+            border-radius: var(--radius-sm) var(--radius-md) var(--radius-md) var(--radius-md);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .message-name {
+            font-weight: 600;
+        }
+
+        .message-time {
+            color: var(--text-light);
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: var(--white);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
+
+        #userInput:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(74, 105, 162, 0.1);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0 25px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            padding: 20px;
+            text-align: center;
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.8);
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(74, 105, 162, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: #F7FAFC;
+        }
+
+        .money {
+            color: #38A169;
+            font-weight: 600;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .brand-title {
+                font-size: 1.2rem;
+            }
+            
+            .actions {
+                gap: 8px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .input-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="brand">
+                <img src="https://img.z4a.net/images/2025/03/19/logo.png" alt="德静财税Pro" class="brand-logo">
+                <h1 class="brand-title">德静财税Pro</h1>
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="clearHistory()">
+                    <i class="ri-delete-bin-line"></i>
+                    <span>清空对话</span>
+                </button>
+                <button class="btn" onclick="exportHistory()">
+                    <i class="ri-file-download-line"></i>
+                    <span>导出报告</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-area">
+            <div id="chatHistory"></div>
+            
+            <div class="loading">
+                <div class="loader"></div>
+                <span>AI正在思考中...</span>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="请输入您想咨询的财税问题..." autocomplete="off">
+                <button class="send-btn" onclick="sendToAI()">
+                    <i class="ri-send-plane-fill"></i>
+                    <span>发送</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="ri-shield-check-line"></i>
+        <span>银行级数据加密 | 安全连接已建立</span>
+    </div>
+
+<script>
+// 配置信息
+const config = {
+    apiKey: "pat_9BGmDeD9muJT0GK6MgekNE4AZ2cUdjaO0BggA3AEfW5B3NiNWUSXS35SE61D3LB0",
+    botId: "7477879044256841743",
+    apiEndpoint: "https://api.coze.cn/open_api/v2/chat"
+};
+
+// 会话管理 - 增强会话ID持久化
+let conversationId = localStorage.getItem('coze_conversation_id') || '';
+let messageHistory = [];
+let hasProvidedContact = false; // 新增：标记用户是否已提供联系方式
+
+// 初始化会话数据和检查联系方式
+function initializeSession() {
+    try {
+        // 从localStorage加载会话ID
+        conversationId = localStorage.getItem('coze_conversation_id') || '';
+        
+        // 加载历史消息
+        const savedMessages = localStorage.getItem('coze_message_history');
+        if (savedMessages) {
+            messageHistory = JSON.parse(savedMessages);
+            
+            // 检查历史消息中是否包含联系方式
+            hasProvidedContact = messageHistory.some(msg => 
+                msg.role === 'user' && 
+                /(?:1[3-9]\d{9}|微信号[:：][\w-]+)/.test(msg.content)
+            );
+            
+            console.log('初始化会话，联系方式状态:', hasProvidedContact);
+        }
+    } catch (e) {
+        console.error('会话初始化失败:', e);
+        messageHistory = [];
+    }
+}
+
+// 用户ID管理 - 增强稳定性
+function getUserId() {
+    let userId = localStorage.getItem('coze_user_id');
+    if (!userId) {
+        // 生成更稳定的用户ID
+        const deviceInfo = navigator.userAgent + screen.width + screen.height;
+        userId = `user_${Math.abs(hashCode(deviceInfo))}_${Date.now()}`;
+        localStorage.setItem('coze_user_id', userId);
+    }
+    return userId;
+}
+
+// 哈希函数 - 新增
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // 转为32位整数
+    }
+    return hash;
+}
+
+// 格式化表格
+function formatTables(content) {
+    const tableRegex = /(\|.*\|(?:\n\|.*\|)+)/g;
+    content = content.replace(tableRegex, match => {
+        const rows = match.trim().split('\n');
+        let html = '<table>';
+        rows.forEach((row, index) => {
+            const cells = row.split('|').slice(1, -1).map(cell => 
+                index === 0 ? `<th>${cell.trim()}</th>` : `<td>${cell.trim()}</td>`
+            ).join('');
+            html += `<tr>${cells}</tr>`;
+        });
+        return html + '</table>';
+    });
+
+    return content.replace(/(¥\d+(?:,\d+)*(?:\.\d+)?)/g, '<span class="money">$1</span>');
+}
+
+// 添加消息到聊天界面 - 增强联系方式检测
+function appendMessage(content, type) {
+    const chatHistory = document.getElementById('chatHistory');
+    const timestamp = new Date().toLocaleTimeString('zh-CN', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+    });
+
+    // 检查用户消息是否包含联系方式
+    if (type === 'user' && !hasProvidedContact) {
+        if (/(?:1[3-9]\d{9}|微信号[:：][\w-]+)/.test(content)) {
+            hasProvidedContact = true;
+            console.log('检测到用户提供联系方式');
+            // 添加系统标记
+            messageHistory.push({
+                role: 'system',
+                content: '用户已提供联系方式，无需再次询问'
+            });
+        }
+    }
+
+    // 添加消息到历史记录
+    if (type === 'user' || type === 'ai') {
+        messageHistory.push({
+            role: type === 'user' ? 'user' : 'assistant',
+            content: content,
+            timestamp: Date.now() // 添加时间戳
+        });
+        // 保存消息历史到localStorage
+        localStorage.setItem('coze_message_history', JSON.stringify(messageHistory));
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}-message`;
+    
+    const formattedContent = formatTables(content.replace(/(更多免费资料|关注公众号).*$/g, ''));
+
+    messageDiv.innerHTML = `
+        <div class="${type === 'user' ? 'user-avatar' : 'ai-avatar'} avatar"></div>
+        <div class="bubble ${type}-bubble">
+            <div class="message-header">
+                <span class="message-name">${type === 'user' ? '企业用户' : '德静郑总智能体'}</span>
+                <span class="message-time">• ${timestamp}</span>
+            </div>
+            <div>${formattedContent}</div>
+        </div>
+    `;
+
+    chatHistory.appendChild(messageDiv);
+    scrollToBottom();
+    saveHistory();
+}
+
+// 页面加载时初始化 - 使用新的初始化函数
+window.onload = () => {
+    // 初始化会话数据
+    initializeSession();
+    
+    const history = localStorage.getItem('chatHistory');
+    if(history) {
+        document.getElementById('chatHistory').innerHTML = history;
+        scrollToBottom();
+    }
+    
+    // 显示安全通知
+    const notification = document.getElementById('notification');
+    notification.classList.add('show');
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+    
+    // 如果是新会话，显示欢迎消息 - 根据联系方式状态调整
+    if (!history) {
+        setTimeout(() => {
+            if (!hasProvidedContact) {
+                appendMessage('您好，我是德静财税专业顾问。请问有什么财税问题需要咨询？首次咨询，请提供您的联系电话，以便我们更好地为您服务。', 'ai');
+            } else {
+                appendMessage('您好，我是德静财税专业顾问。请问有什么财税问题需要咨询？', 'ai');
+            }
+        }, 500);
+    }
+};
+
+// 清理Coze AI特殊格式的回复 - 移到全局作用域
+function cleanCozeResponse(text) {
+    // 处理包含reference的JSON格式
+    text = text.replace(/\{\{item\.reference\}\}\"\},.*?\"reference\":\"(.*?)\".*?\}/gs, function(match, content) {
+        return content;
+    });
+    
+    // 处理其他可能的JSON格式
+    text = text.replace(/\{\{.*?\}\}/g, "");
+    
+    // 处理FlowpdCiciComponents相关的代码
+    text = text.replace(/\"FlowpdCiciComponents.*?\}\}\}/gs, "");
+    
+    // 处理rootID和variables相关的代码
+    text = text.replace(/\"rootID\":\"root\".*?variables.*?\}\}\}/gs, "");
+    
+    // 处理链接格式
+    text = text.replace(/\"link\":\"(http[^\"]+)\".*?\"title\":\"([^\"]+)\"/g, function(match, url, title) {
+        return `${title}: ${url}`;
+    });
+    
+    // 移除多余的反斜杠和引号
+    text = text.replace(/\\"/g, '"');
+    text = text.replace(/\\\\/g, '\\');
+    
+    // 处理多余的空行
+    text = text.replace(/\n{3,}/g, "\n\n");
+    
+    return text;
+}
+
+// 发送消息到AI - 修改请求处理方式
+async function sendToAI() {
+    const userInput = document.getElementById('userInput');
+    const loading = document.querySelector('.loading');
+    const question = userInput.value.trim();
+
+    if (!question) return;
+
+    try {
+        appendMessage(question, 'user');
+        userInput.value = '';
+        loading.style.display = 'flex';
+
+        // 准备请求体 - 增强上下文管理和提示词优化
+        // 在sendToAI函数中，替换请求体构建部分
+        const requestBody = {
+            bot_id: config.botId,
+            user: getUserId(),
+            query: hasProvidedContact 
+                ? `[用户已提供联系方式] ${question}` 
+                : question,
+            stream: false,
+            conversation_id: conversationId || undefined
+        };
+        
+        // 如果有历史消息，添加到请求中
+        if (messageHistory.length > 0) {
+            // 过滤掉系统消息，只保留用户和AI的对话
+            const filteredMessages = messageHistory
+                .filter(msg => msg.role !== 'system')
+                .slice(-10)
+                .map(msg => {
+                    // 如果已提供联系方式，修改用户消息
+                    if (hasProvidedContact && msg.role === 'user') {
+                        return {
+                            role: msg.role,
+                            content: msg.content.startsWith('[用户已提供联系方式]') 
+                                ? msg.content 
+                                : `[用户已提供联系方式] ${msg.content}`
+                        };
+                    }
+                    return {
+                        role: msg.role,
+                        content: msg.content
+                    };
+                });
+            
+            requestBody.context = {
+                messages: filteredMessages
+            };
+        }
+
+        console.log('发送请求:', JSON.stringify(requestBody, null, 2));
+
+        const response = await fetch(config.apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.apiKey}`
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
+        
+        const data = await response.json();
+        if (data.code !== 0) throw new Error(data.msg || "服务异常");
+
+        // 保存会话ID
+        if (data.conversation_id) {
+            conversationId = data.conversation_id;
+            localStorage.setItem('coze_conversation_id', conversationId);
+        }
+
+        const validMessage = data.messages.find(msg => 
+            msg.type === 'answer' && !msg.content.includes('knowledge_recall')
+        );
+        
+        if(validMessage) {
+            // 处理AI回复，过滤掉搜索结果格式的内容
+            let aiResponse = validMessage.content;
+            
+            // 清理Coze AI特殊格式的回复
+            aiResponse = cleanCozeResponse(aiResponse);
+            
+            // 删除"很抱歉，我需要更直接地回答您的问题"这段话
+            aiResponse = aiResponse.replace(/^很抱歉，我需要更直接地回答您的问题。?\s*/i, '');
+            
+            // 移除之前的预设回答逻辑，直接使用AI的实际回复
+            appendMessage(aiResponse, 'ai');
+        } else {
+            throw new Error("未获取到有效回复");
+        }
+
+    } catch (error) {
+        appendMessage(`⚠️ 系统错误：${error.message}`, 'ai');
+    } finally {
+        loading.style.display = 'none';
+        saveHistory();
+    }
+}
+
+// 滚动到底部
+function scrollToBottom() {
+    const chatHistory = document.getElementById('chatHistory');
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+// 保存聊天历史
+function saveHistory() {
+    localStorage.setItem('chatHistory', document.getElementById('chatHistory').innerHTML);
+}
+
+// 清空聊天历史 - 重置联系方式状态
+function clearHistory() {
+    if(confirm('确定要清空所有咨询记录吗？')) {
+        document.getElementById('chatHistory').innerHTML = '';
+        localStorage.removeItem('chatHistory');
+        // 清除会话相关数据
+        localStorage.removeItem('coze_conversation_id');
+        localStorage.removeItem('coze_message_history');
+        conversationId = '';
+        messageHistory = [];
+        hasProvidedContact = false; // 重置联系方式状态
+        
+        // 显示欢迎消息
+        setTimeout(() => {
+            appendMessage('您好，我是德静财税专业顾问。请问有什么财税问题需要咨询？首次咨询，请提供您的联系电话，以便我们更好地为您服务。', 'ai');
+        }, 500);
+    }
+}
+
+// 导出聊天记录
+function exportHistory() {
+    const messages = Array.from(document.querySelectorAll('.message')).map(msg => {
+        const isUser = msg.classList.contains('user-message');
+        const name = isUser ? '企业用户' : '德静郑总智能体';
+        const content = msg.querySelector('.bubble').innerText;
+        return `【${name}】\n${content}\n\n`;
+    }).join('');
+    
+    const report = `德静财税咨询报告\n生成时间：${new Date().toLocaleString()}\n\n${messages}`;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `德静财税咨询报告_${new Date().toLocaleDateString().replace(/\//g, '-')}.txt`;
+    a.click();
+}
+
+// 回车发送消息
+document.getElementById('userInput').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') sendToAI();
+});
+</script>
+</body>
+</html>
